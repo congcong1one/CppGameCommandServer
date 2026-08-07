@@ -1,0 +1,36 @@
+# AGENTS.md — 跨Agent协作协议
+
+本仓库是用户（黄梓濠）C++游戏服务端转型项目的**唯一进度共享总线**。多个Agent可能运行在不同主机上，通过本仓库的Git历史同步信息。任何Agent在操作本项目前必须遵守本协议。
+
+## 会话启动（任何Agent必读）
+
+1. `git pull --rebase` 获取其他Agent的最新进度。
+2. 读取 `PROJECT_STATE.md`（唯一权威进度）：当前模式、交付门、任务卡、验收看板、唯一任务。
+3. 按需读取 `DECISION_LOG.md`（重大决定）、`EVIDENCE_LEDGER.md`（能力证据）、`INTERVIEW_FEEDBACK.md`（面试反馈）、`PARKING_LOT.md`（停放主题）。
+4. 辅导行为规范以 `.qoder/skills/cxx-game-server-transition-coach/` 中的Skill为准（回答结构、工作模式、AI代码所有权、范围控制、升级判定）。
+5. 不要让用户重述背景；状态文件里没有的信息，最多用一个问题确认。
+
+## 会话结束（任何Agent必写）
+
+1. 更新 `PROJECT_STATE.md`：当前模式、交付门、任务卡、验收看板勾选、唯一任务、最近构建/测试结果、变更历史表。
+2. 重大调整写入 `DECISION_LOG.md`；新证据写入 `EVIDENCE_LEDGER.md`；面试写入 `INTERVIEW_FEEDBACK.md`；停放主题写入 `PARKING_LOT.md`。
+3. `git add` 相关文件 → commit（信息清晰、描述本次推进与证据）→ `git push`。推送前如落后先 `git pull --rebase`。
+
+## Git纪律
+
+- 每个小阶段推送一次；交付门完成时打标签（如 `gate-a`）。
+- 只追加变更记录，不改写历史；冲突时以"已验证的构建/测试/代码"为最高事实源。
+- 状态文件之间保持一致：PROJECT_STATE的勾选必须能在EVIDENCE_LEDGER或git历史中找到证据。
+- 不提交无关文件（`cpp.docx` 已在 .gitignore）。
+
+## 升级判定（所有Agent统一执行）
+
+- 某Gate全部验收项勾选后才宣布进入下一阶段；不凭感觉升级。
+- Gate A完成 → 提醒校准面试；Gate B完成 → 提醒主要投递。
+- 每次涉及进度的回答必须告知：当前阶段、本次推进项、剩余项、是否达到升级条件。
+
+## 用户约束（所有Agent必须尊重）
+
+- 学习模式核心模块第一版由用户主写；Agent提供设计卡、骨架、Review、测试，不代写。
+- 每周仅约6—8小时可投入；不制造计划债务，中断后帮助最小恢复。
+- 不夸大个人项目、商业C++经验、性能数据或AI贡献。
