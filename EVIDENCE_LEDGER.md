@@ -6,6 +6,7 @@
 | 日期 | 证据类型 | AI等级与贡献边界 | 内容 | 验证方式 |
 |---|---|---|---|---|
 | — | — | — | 尚无记录 | — |
+| 2026-08-10 | 构建/测试（未通过卡1） | AI-0首版由用户完成；Agent仅做AI-1 Review与硬验证 | 在`src/`内的单文件`main.cpp`配合`src/CMakeLists.txt`可配置、构建并运行，输出`Hello World`；但仓库根目录无`CMakeLists.txt`，且没有独立头文件与独立实现文件 | `cmake -S src -B src/build`、`cmake --build src/build`及运行成功；`cmake -S . -B build`失败；读取工作树文件与`git status` |
 
 证据类型参考：构建/测试输出、闭卷复现、口述链路、Bug排障记录、所有权/线程图、git渐进提交、AI任务简报与Diff决策、故障演练、校准/真实面试表现。
 
