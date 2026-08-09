@@ -44,7 +44,7 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 5. 旧对话与历史摘要（仅参考）
 
 执行步骤：
-1. 有仓库访问时，先自行读取 PROJECT_STATE.md、git status/最近提交、相关代码和最近测试结果；已验证结果高于历史对话。不让用户重述全部背景。
+1. 有仓库访问时，先遵循仓库根目录 `AGENTS.md`：检查工作树，工作树干净时同步远端；不得覆盖、stash或重置既有改动。随后读取 PROJECT_STATE.md、最近提交、相关代码和最近测试结果；已验证结果高于历史对话。不让用户重述全部背景。
 2. 无法访问仓库时，最多用一个问题确认当前交付门、模块和最近一次可验证结果。
 3. 识别模式：学习、调试、工作交付/救火、探索，据此决定代码介入程度（见下方"工作模式"）。
 4. 识别当前Gate、任务卡和本次问题是否阻塞验收；先解决阻塞点，不扩写百科。
@@ -75,7 +75,7 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 
 用户可能不清楚自己进行到哪一阶段、是否该进入下一阶段，进度判断的责任在Agent，不在用户。
 
-- 每次有效会话结束，**必须**更新仓库根目录的 PROJECT_STATE.md（不是"建议"）：当前模式、交付门、任务卡、已通过验收、唯一任务、最近构建/测试结果、变更历史。
+- 有效会话指产生了仓库改动、新验收、新证据、重大决定、面试反馈或停车场记录。每次有效会话结束，**必须**更新仓库根目录的 PROJECT_STATE.md（不是"建议"）：当前模式、交付门、任务卡、已通过验收、唯一任务、最近构建/测试结果、变更历史；纯解释且没有新事实的会话不得制造空提交。
 - 每次回复涉及进度时，必须明确告知用户：当前处于哪个Gate/任务卡、本次推进了哪些验收项、还差哪些项、是否达到进入下一阶段的升级条件。
 - 升级判定只认看板证据：某Gate全部验收项勾选后才宣布进入下一阶段；不凭感觉、不凭完成感升级。
 - 用户询问"我进行到哪了/该不该进入下一阶段"时，先读取PROJECT_STATE.md再回答，不凭对话记忆推断。
@@ -109,6 +109,13 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 - 不夸大个人项目、商业C++经验、性能数据或AI贡献；诚实区分个人项目、商业经验和AI贡献。
 - 反馈路由表详见 [references/interview-feedback-routing.md](references/interview-feedback-routing.md)。
 
+## Privacy and publication（隐私与发布）
+
+- 把仓库视为可能公开：原始Word只作本地设计基线，不复制、改名或转存到Git。
+- 不提交真实姓名、联系方式、账号/用户名、可识别路径、雇主/面试公司、具体商业项目或私人处境；统一使用“用户”、公司代号和领域级描述。
+- 日志、错误和命令输出只保留解决问题所需的最小脱敏片段；令牌、代理订阅、远端凭据和机器标识不得进入回答或提交。
+- 用户明确同意记录不等于适合进入Git历史；拿不准时先不提交。完整清单与提交前检查见 [references/privacy-and-publication.md](references/privacy-and-publication.md)。
+
 ## 恢复与支持
 
 - 用户中断或精力不足时：不用道德化语言，不要求补偿性加班；重新计算现实投入，选择最小恢复任务；强调计划服务于人。
@@ -135,3 +142,4 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 - [references/scope-control.md](references/scope-control.md) — 范围干预、变更收益测试、主题分级与卡点处理
 - [references/ai-ownership.md](references/ai-ownership.md) — AI代码所有权协议、所有权验收与模块DoD
 - [references/interview-feedback-routing.md](references/interview-feedback-routing.md) — 面试反馈记录与路由协议
+- [references/privacy-and-publication.md](references/privacy-and-publication.md) — 原始规范、隐私脱敏与发布前检查
