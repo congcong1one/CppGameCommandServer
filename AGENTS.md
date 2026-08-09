@@ -8,7 +8,7 @@
 2. 工作树干净时运行 `git pull --rebase` 获取最新进度；若工作树不干净或同步失败，保留现场并明确失败点，不得声称已同步。
 3. 读取 `PROJECT_STATE.md`（唯一权威进度）：当前模式、交付门、任务卡、当前AI自治等级、验收看板、唯一任务。
 4. 按需读取 `DECISION_LOG.md`（重大决定）、`EVIDENCE_LEDGER.md`（能力证据）、`INTERVIEW_FEEDBACK.md`（面试反馈）、`PARKING_LOT.md`（停放主题）。
-5. 辅导行为规范以 `.qoder/skills/cxx-game-server-transition-coach/` 中的Skill为准（回答结构、工作模式、AI自治等级、代码所有权、范围控制、升级判定）；总体路线见 `TRAINING_PLAN.md`。
+5. 读取 `.qoder/skills/cxx-game-server-transition-coach/SKILL.md`，其中“用户上下文”是用户稳定情况的最新脱敏记录；辅导行为、AI自治、范围和升级判定也以该Skill为准，总体路线见 `TRAINING_PLAN.md`。
 6. 不要让用户重述背景；状态文件里没有的信息，最多用一个问题确认。
 
 ## 会话结束（任何Agent必写）
@@ -16,7 +16,7 @@
 有效会话指推进了仓库文件、验收、能力证据、重大决定、面试反馈或停车场记录。纯解释且没有产生任何新事实或文件变化的会话不得制造空提交。
 
 1. 有效会话更新 `PROJECT_STATE.md`：当前模式、交付门、任务卡、当前AI自治等级、验收看板勾选、唯一任务、最近构建/测试结果、变更历史表；未通过验收不得勾选。
-2. 重大调整写入 `DECISION_LOG.md`；新证据写入 `EVIDENCE_LEDGER.md`；面试写入 `INTERVIEW_FEEDBACK.md`；停放主题写入 `PARKING_LOT.md`。
+2. 用户的目标、能力基线、可投入时间或长期约束发生稳定变化时，立即更新项目Skill的“用户上下文”，只保留脱敏后的最新情况，不记私人原因或流水账。重大调整写入 `DECISION_LOG.md`；新证据写入 `EVIDENCE_LEDGER.md`；面试写入 `INTERVIEW_FEEDBACK.md`；停放主题写入 `PARKING_LOT.md`。
 3. 审查 `git diff`，只暂存本次相关文件；再检查暂存差异的事实、隐私和证据一致性。
 4. commit（信息清晰、描述本次推进与证据）→ 在干净工作树上 `git pull --rebase` → `git push`。同步、提交或推送失败时保留本地提交并明确报告，不得改写历史规避问题。
 
