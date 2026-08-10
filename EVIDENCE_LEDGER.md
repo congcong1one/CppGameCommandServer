@@ -7,6 +7,7 @@
 |---|---|---|---|---|
 | — | — | — | 尚无记录 | — |
 | 2026-08-10 | 构建/测试（未通过卡1） | AI-0首版由用户完成；Agent仅做AI-1 Review与硬验证 | 在`src/`内的单文件`main.cpp`配合`src/CMakeLists.txt`可配置、构建并运行，输出`Hello World`；但仓库根目录无`CMakeLists.txt`，且没有独立头文件与独立实现文件 | `cmake -S src -B src/build`、`cmake --build src/build`及运行成功；`cmake -S . -B build`失败；读取工作树文件与`git status` |
+| 2026-08-10 | 构建/测试（卡1通过） | 多文件工程及修正均由用户主写；Agent在AI-1下Review、定位most vexing parse和返回类型错误并执行硬验证 | 根目录`CMakeLists.txt`将`main.cpp`与`t1.cpp`组成`CppCommandServer`，共享声明位于独立头文件；配置、编译、链接和运行成功 | 全新临时构建目录执行根目录配置与详细构建；两个对象文件成功链接；运行输出两行预期结果；clangd基于编译数据库检查两个源文件均为0错误 |
 
 证据类型参考：构建/测试输出、闭卷复现、口述链路、Bug排障记录、所有权/线程图、git渐进提交、AI任务简报与Diff决策、故障演练、校准/真实面试表现。
 

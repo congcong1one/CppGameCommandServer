@@ -1,4 +1,6 @@
-#include<iostream>
-int main(){
-	std::cout<<"Hello World" << std::endl;
+#include "t1.hpp"
+int main() {
+    t1 t;
+    t.prt();
+    std::cout << "hello world 2" << std::endl;
 }

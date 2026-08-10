@@ -47,7 +47,15 @@ AI Coding 与 C++ 同期训练，但按证据逐级放权：Gate A 以 AI-0（�
 
 ## 构建状态
 
-当前尚未形成可构建的 C++ 工程，因此这里不提供虚构的构建命令。首个 CMake 工程由用户按 [PROJECT_STATE.md](PROJECT_STATE.md) 的唯一任务完成后，再补充经过实际验证的命令。
+当前已形成最小多文件 CMake 工程。经过验证的命令为：
+
+```bash
+cmake -S . -B build
+cmake --build build
+./build/CppCommandServer
+```
+
+程序当前输出两行可观察结果。仓库仍处于 Gate A，最新完成度和唯一任务以 [PROJECT_STATE.md](PROJECT_STATE.md) 为准。
 
 ## License
 

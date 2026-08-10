@@ -3,6 +3,7 @@
 
 # CMake build trees and generated files
 /build/
+/src/build/
 /cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
@@ -16,6 +17,7 @@ compile_commands.json
 *.log
 
 # Editor-local state
+/.cache/
 .idea/
 .vscode/
 *.swp
