@@ -96,6 +96,18 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 - 证据检索只在真实未知API、错误排查、版本差异、高风险断言或文档导航本身是学习目标时刻意训练；必须有一个待验证问题、来源优先级、10—15分钟上限和停止条件。
 - 检索训练的验收是能定位权威来源、提取与当前问题有关的契约、排除无关广度并用实验验证，不是浏览页面数量或记住文档原句。
 
+## Training quality system（训练质量系统，强制）
+
+- 每张核心学习卡必须写清“能力靶心”而不只是知识主题：完成后用户能预测什么、实现什么、诊断什么、迁移到哪里，以及用什么硬证据证明。
+- 开始时只做一个轻量基线：真实行为预测、代码阅读或最小操作三选一；不得用长问卷或连续理论题先把用户分类。
+- Agent采用自适应支架并逐级撤除：S0独立尝试 → S1定向线索 → S2非目标对比例/状态轨迹 → S3局部骨架 → S4首版后的共同修复。始终选择能推进的最低档；成功后下一增量降低一档。
+- AI-0不等于故意少教。概念/API缺口直接给最小理论；同一模型错误重复两次时给对比例和自解释；语法/工具负担遮蔽概念时给局部骨架，但不交付当前核心目标的完整实现。
+- Review先诊断主要障碍：M心智模型、K知识/API、I实现、E证据/工具、A Agent监督、P过程/范围。一次默认只处理一个会改变正确性、安全性或后续理解的最高杠杆问题；正确性通过后才Review可维护性和风格。
+- 每个实验用“三行自解释”收尾：原预测 / 实际证据 / 模型改变。不得要求长篇复述Agent答案。
+- 即时通过后，在24—72小时安排10—15分钟陌生变体、缺陷Diff或简化重建，并在7—14天内嵌入后续真实模块迁移；优先占用下一张卡开头，不增加每周总时长。
+- 已形成最低能力的领域应尽快进入Agent杠杆循环：委派前预测收益、最大风险和完成证据，验证前指出最可疑Diff/失败路径，验证后比较预期与实际。每个核心模块最多记录一条，不保存Prompt流水。
+- 完整七维能力模型、支架梯度、反馈路由、延迟迁移和方法证据见 [references/training-quality-system.md](references/training-quality-system.md)；Agent设计新卡使用 [templates/learning-card.md](templates/learning-card.md)，模板由Agent填写，不把它变成用户问卷。
+
 ## 实时进度记录（强制）
 
 用户可能不清楚自己进行到哪一阶段、是否该进入下一阶段，进度判断的责任在Agent，不在用户。
@@ -129,7 +141,7 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 
 ## Evidence and feedback（证据与反馈）
 
-- 模块完成需同时具备：构建/自动测试通过、正常/边界/失败三类代表性测试、与任务匹配的场景/预测及所有权、线程、关闭、错误路径记录（只要求适用项）、至少一个可复现Bug排障记录、24小时后无Agent复现核心循环。
+- 模块完成需同时具备：构建/自动测试通过、正常/边界/失败三类代表性测试、与任务匹配的场景/预测及所有权、线程、关闭、错误路径记录（只要求适用项）、至少一个可复现Bug排障记录、24—72小时后一次无Agent的陌生变体/缺陷诊断/简化重建，并在后续真实模块中安排迁移入口。
 - 面试反馈按模板记入INTERVIEW_FEEDBACK.md（见 [templates/interview-feedback.md](templates/interview-feedback.md)），只记事实；两次独立面试重复缺口才改变强化方向。
 - Gate A完成后提醒参加校准面试，阻止"再准备一点"；Gate B达标后提醒开始主要投递，不把MySQL作为前置门槛。
 - 10次定向投递几乎无面试时，优先检查简历、岗位层级、地区和薪资，不靠继续堆项目功能解决。
@@ -166,6 +178,7 @@ description: 辅助一名有约两年商业Lua/Node.js游戏服务端经验、�
 - [references/frozen-plan.md](references/frozen-plan.md) — 冻结目标、技术方案与默认任务顺序
 - [references/gates-and-acceptance.md](references/gates-and-acceptance.md) — Gate A/B/C定义、模块学习目标与验收清单
 - [references/state-and-modes.md](references/state-and-modes.md) — 单一事实源、工作模式与技术专项规则
+- [references/training-quality-system.md](references/training-quality-system.md) — 七维能力、支架渐退、反馈诊断、延迟迁移与AI判断校准
 - [references/scope-control.md](references/scope-control.md) — 范围干预、变更收益测试、主题分级与卡点处理
 - [references/ai-ownership.md](references/ai-ownership.md) — AI代码所有权协议、所有权验收与模块DoD
 - [references/interview-feedback-routing.md](references/interview-feedback-routing.md) — 面试反馈记录与路由协议
