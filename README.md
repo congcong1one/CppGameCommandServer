@@ -30,10 +30,10 @@ Gate B 完成前不接入第二复杂业务、微服务、Redis、无锁队列�
 
 ## AI 协作与证据
 
-AI Coding 与 C++ 同期训练，但按证据逐级放权：Gate A 以 AI-0（闭卷形成）和 AI-1（教练/Review）为主；Gate B 引入 AI-2（受约束委派）；Gate C 才验证 AI-3（Agent 主导有边界交付）。核心模块的第一版结构和关键路径仍由用户主导，生成内容在用户 Review、解释和硬验证前不计为用户能力证据。
+AI Coding 与 C++ 同期训练，但按证据逐级放权：Gate A 以 AI-0（独立形成）和 AI-1（教练/Review）为主；Gate B 引入 AI-2（受约束委派）；Gate C 才验证 AI-3（Agent 主导有边界交付）。核心模块的第一版结构和关键路径仍由用户主导，生成内容在用户 Review、解释和硬验证前不计为用户能力证据。
 
 完整路线、自治升级条件、中间件优先级和每周节奏见 [TRAINING_PLAN.md](TRAINING_PLAN.md)。
-当前可直接开始的闭卷任务见 [Gate A卡1：15分钟多文件CMake工程](tasks/gate-a-card-01-cmake.md)。
+当前可直接开始的任务见 [Gate A卡3：RAII文件描述符](tasks/gate-a-card-03-raii-fd.md)：先读实验A的8分钟最小理论包，写一句预测，再完成最小作用域析构实验。
 
 ## 仓库协议
 
