@@ -4,11 +4,16 @@
 # CMake build trees and generated files
 /build/
 /src/build/
+**/build/
 /cmake-build-*/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 compile_commands.json
+
+# Generator output from local card attempts
+**/Makefile
+/src/main
 
 # Compiled output and diagnostics
 *.a
