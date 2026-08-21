@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 4.4)
 project(CppCommandServer)
 add_executable(CppCommandServer src/main.cpp
 	src/t1.cpp
