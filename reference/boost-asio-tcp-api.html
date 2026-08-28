@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boost.Asio 1.83 TCP服务端API速查</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+  <h1>Boost.Asio 1.83 TCP服务端 API 速查</h1>
+  <p class="lead">签名为便于学习而简化，采用普通lambda回调。模板文档中的<code>DEDUCED</code>表示返回类型由completion token决定；使用普通回调时调用表达式返回<code>void</code>，真正结果进入回调。</p>
+
+  <h2>1. 事件循环</h2>
+  <table>
+    <thead><tr><th>API</th><th>参数</th><th>返回/结果</th><th>项目含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>boost::asio::io_context io;</code></td><td>默认构造无需参数。</td><td>构造函数无返回值。</td><td>持有异步I/O服务和待执行handler；V1由一个I/O线程调用<code>run()</code>。</td></tr>
+      <tr><td><code>io.run()</code></td><td>无。</td><td><code>count_type</code>：本次执行的handler数量。没有未完成工作或被<code>stop()</code>时返回。</td><td>事件循环；异步操作的回调只会在正在运行io_context的线程上执行。</td></tr>
+      <tr><td><code>io.stop()</code></td><td>无。</td><td><code>void</code>。</td><td>请求事件循环尽快停止；不保证剩余handler都执行。</td></tr>
+      <tr><td><code>io.restart()</code></td><td>无。</td><td><code>void</code>。</td><td><code>run()</code>正常返回后，如需再次运行必须先restart；有线程仍在run时不可调用。</td></tr>
+      <tr><td><code>boost::asio::post(io, fn)</code></td><td><code>io</code>为目标执行上下文；<code>fn</code>签名为<code>void()</code>。</td><td>普通回调用法为<code>void</code>；任务稍后由io线程执行，不在<code>post</code>内部直接调用。</td><td>CommandExecutor完成业务后，把响应安全投递回I/O线程。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. 地址与监听</h2>
+  <table>
+    <thead><tr><th>API</th><th>参数</th><th>返回/结果</th></tr></thead>
+    <tbody>
+      <tr><td><code>tcp::endpoint(tcp::v4(), port)</code></td><td><code>tcp::v4()</code>选择IPv4；<code>port</code>是主机字节序端口，类型近似<code>uint16_t</code>。</td><td>构造<code>tcp::endpoint</code>，地址为任意本地IPv4地址。</td></tr>
+      <tr><td><code>tcp::acceptor(io, endpoint, reuse_addr)</code></td><td>事件上下文、监听endpoint；<code>reuse_addr</code>默认<code>true</code>。</td><td>构造并完成open/bind/listen的acceptor；失败抛<code>boost::system::system_error</code>。</td></tr>
+      <tr><td><code>acceptor.open(protocol, ec)</code></td><td>通常传<code>endpoint.protocol()</code>；<code>ec</code>接收错误。</td><td><code>void</code>；不抛异常版本通过<code>ec</code>报告结果。</td></tr>
+      <tr><td><code>acceptor.set_option(tcp::acceptor::reuse_address(true), ec)</code></td><td>socket选项和错误码输出参数。</td><td><code>void</code>。</td></tr>
+      <tr><td><code>acceptor.bind(endpoint, ec)</code></td><td>要绑定的本地地址/端口和错误码。</td><td><code>void</code>；常见错误是端口已占用或权限不足。</td></tr>
+      <tr><td><code>acceptor.listen(backlog, ec)</code></td><td><code>backlog</code>是内核待accept连接队列上限提示；可用<code>socket_base::max_listen_connections</code>。</td><td><code>void</code>。</td></tr>
+      <tr><td><code>acceptor.async_accept(handler)</code></td><td><code>handler(error_code ec, tcp::socket socket)</code>。</td><td>立即返回；成功时回调获得新socket。每次完成后需要再次发起accept，停止中的<code>operation_aborted</code>除外。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Buffer、读取和写入</h2>
+  <table>
+    <thead><tr><th>API</th><th>参数</th><th>返回/回调</th><th>关键契约</th></tr></thead>
+    <tbody>
+      <tr><td><code>asio::buffer(data, size)</code></td><td>可写<code>void*</code>得到<code>mutable_buffer</code>；只读<code>const void*</code>得到<code>const_buffer</code>；<code>size</code>为字节数。</td><td>返回轻量内存视图。</td><td>不复制、不拥有内存；底层数组/string/vector必须活到异步回调结束，期间不能发生使地址失效的扩容或销毁。</td></tr>
+      <tr><td><code>socket.async_read_some(buffers, handler)</code></td><td>可写buffer序列；<code>handler(ec, bytes)</code>。</td><td>立即返回；成功回调给出这一次实际读取字节数。</td><td>可能只读到请求的一部分；TCP没有消息边界。适合增量PacketCodec，不等于“读取一个包”。</td></tr>
+      <tr><td><code>asio::async_read(socket, buffers, handler)</code></td><td>socket、可写buffer序列、<code>handler(ec, bytes)</code>。</td><td>立即返回；默认填满给定buffer或遇到错误后完成。</td><td>适合先精确读取固定长度包头，再按校验后的长度读取包体。同一socket上完成前不要启动第二个读取操作。</td></tr>
+      <tr><td><code>asio::async_write(socket, buffers, handler)</code></td><td>socket、只读buffer序列、<code>handler(ec, bytes)</code>。</td><td>立即返回；写完全部buffer或遇错后完成。</td><td>底层可能多次部分发送。完成前不要并发启动另一个写操作；用SendQueue串行化。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. 错误、连接信息和关闭</h2>
+  <table>
+    <thead><tr><th>API</th><th>参数</th><th>返回/含义</th></tr></thead>
+    <tbody>
+      <tr><td><code>if (ec)</code></td><td><code>boost::system::error_code</code>。</td><td><code>true</code>表示失败；<code>ec.message()</code>返回可读文本，<code>ec.value()</code>返回类别相关整数。逻辑分支优先比较<code>asio::error::eof</code>、<code>operation_aborted</code>等枚举，不只比较整数。</td></tr>
+      <tr><td><code>socket.is_open()</code></td><td>无。</td><td><code>bool</code>：本地socket对象是否持有打开的底层socket；不证明对端仍在线。</td></tr>
+      <tr><td><code>socket.remote_endpoint(ec)</code></td><td>错误码输出参数。</td><td>返回<code>tcp::endpoint</code>；可取<code>address()</code>和<code>port()</code>用于日志。</td></tr>
+      <tr><td><code>socket.cancel(ec)</code></td><td>错误码输出参数。</td><td><code>void</code>；请求取消关联的异步操作，回调通常以<code>operation_aborted</code>完成。</td></tr>
+      <tr><td><code>socket.shutdown(tcp::socket::shutdown_both, ec)</code></td><td>关闭发送、接收或双向能力；<code>ec</code>接收错误。</td><td><code>void</code>；影响TCP方向状态，不释放本地socket句柄。</td></tr>
+      <tr><td><code>socket.close(ec)</code></td><td>错误码输出参数。</td><td><code>void</code>；释放底层socket并取消未完成异步操作。关闭应设计为幂等状态机，而不是仅检查一次<code>is_open()</code>。</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. 第二阶段再加入</h2>
+  <table>
+    <thead><tr><th>API</th><th>用途</th><th>返回/回调</th></tr></thead>
+    <tbody>
+      <tr><td><code>steady_timer::expires_after(duration)</code> + <code>async_wait(handler)</code></td><td>登录超时、读超时、心跳检测。</td><td><code>expires_after</code>返回被取消的等待数量；handler为<code>void(error_code)</code>。</td></tr>
+      <tr><td><code>signal_set(io, SIGINT, SIGTERM)</code> + <code>async_wait(handler)</code></td><td>把进程停止信号接入正常异步关闭链路。</td><td>handler为<code>void(error_code, int signal_number)</code>。</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warning"><strong>当前不学：</strong><code>strand</code>、<code>co_spawn</code>/<code>awaitable</code>、多io_context、多I/O线程。V1只有一个I/O线程，先把Session、PacketCodec、SendQueue和关闭语义做对。</div>
+
+  <h2>官方入口</h2>
+  <p><a href="https://www.boost.org/doc/libs/1_83_0/doc/html/boost_asio/reference.html">Boost.Asio 1.83 Reference</a> · <a href="https://www.boost.org/doc/libs/1_83_0/doc/html/boost_asio/tutorial.html">Boost.Asio 1.83 Tutorial</a></p>
+</main>
+</body>
+</html>
+

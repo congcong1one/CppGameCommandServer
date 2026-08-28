@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第一课：Boost.Asio最小TCP服务端</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body>
+<main>
+  <span class="tag">约20分钟 · Boost 1.83 · C++17</span>
+  <h1>第一课：从监听到收包</h1>
+  <p class="lead">本课的唯一胜利条件：看到一段异步TCP代码时，能说清每一步何时完成、结果出现在哪里，以及谁必须继续存活。</p>
+
+  <h2>先建立一张运行图</h2>
+  <div class="flow" aria-label="TCP服务端控制流">
+    <span>io_context</span><b>→</b><span>acceptor</span><b>→</b><span>async_accept</span><b>→</b><span>Session(socket)</span><b>→</b><span>async_read</span><b>→</b><span>PacketCodec</span><b>→</b><span>SendQueue / async_write</span>
+  </div>
+  <p><code>io_context</code>是handler的执行场；<code>acceptor</code>只负责监听和产生已连接socket；每个<code>Session</code>拥有一个socket、读buffer、解析状态与发送队列。</p>
+
+  <div class="callout"><strong>异步API的共同语法：</strong>调用函数只登记操作并立即返回；完成结果不从调用点return，而是稍后以<code>error_code</code>和结果参数进入handler。官方文档把返回类型写成<code>DEDUCED</code>，因为它由completion token决定；当前普通lambda用法可理解为返回<code>void</code>。</div>
+
+  <h2>监听连接：4个对象/API</h2>
+  <pre><code>using tcp = boost::asio::ip::tcp;
+
+boost::asio::io_context io;
+tcp::endpoint endpoint(tcp::v4(), 7000);
+tcp::acceptor acceptor(io, endpoint);
+
+acceptor.async_accept(
+    [](boost::system::error_code ec, tcp::socket socket) {
+        // ec == 0: socket是一条新连接
+    });
+
+std::size_t handlers = io.run();</code></pre>
+  <ul>
+    <li><code>tcp::v4()</code>选择IPv4；<code>7000</code>是主机字节序端口。</li>
+    <li><code>tcp::acceptor(io, endpoint)</code>的便捷构造会open、bind并listen；构造函数没有返回值，失败默认抛异常。</li>
+    <li><code>async_accept(handler)</code>立即返回。handler参数<code>ec</code>说明成败，<code>socket</code>是成功连接。</li>
+    <li><code>io.run()</code>阻塞执行handler，返回本次执行的handler数量；没有工作或被stop后结束。</li>
+  </ul>
+
+  <h2>读取游戏包：不要把TCP当消息队列</h2>
+  <p>TCP只提供有序字节流。一次客户端发送可能被服务端分成多次读取；多次发送也可能合并在一次读取里。第一版协议可使用“固定4字节长度头 + 包体”。</p>
+  <pre><code>// 先精确读满固定包头
+boost::asio::async_read(
+    socket,
+    boost::asio::buffer(header),
+    [self](boost::system::error_code ec, std::size_t bytes) {
+        // 校验header中的body_length，再发起下一次async_read读取包体
+    });</code></pre>
+  <p><code>async_read</code>参数依次是流、可写buffer、完成handler。它通过若干次底层<code>async_read_some</code>填满buffer或遇错。handler中的<code>bytes</code>是实际写入buffer的字节数。</p>
+  <div class="warning"><strong>生命周期红线：</strong><code>boost::asio::buffer(header)</code>只是“地址+长度”视图，不拥有<code>header</code>。异步操作完成前，Session、socket、header和捕获它们的handler都必须有效。</div>
+
+  <h2>发送响应：为什么需要SendQueue</h2>
+  <pre><code>boost::asio::async_write(
+    socket,
+    boost::asio::buffer(outbound_message),
+    [self](boost::system::error_code ec, std::size_t bytes) {
+        // 完成后才能弹出当前消息并启动下一次写
+    });</code></pre>
+  <p><code>async_write</code>会通过若干次部分发送，直到全部buffer写完或发生错误。它不允许你在前一次组合写完成前对同一socket再启动另一次写；SendQueue的职责是保持消息内存有效、串行化写操作并限制积压。</p>
+
+  <h2>关闭链路</h2>
+  <pre><code>boost::system::error_code ignored;
+socket.cancel(ignored);
+socket.shutdown(tcp::socket::shutdown_both, ignored);
+socket.close(ignored);</code></pre>
+  <p><code>cancel</code>让未完成异步操作进入完成回调，常见结果是<code>operation_aborted</code>；<code>shutdown</code>改变TCP收发方向；<code>close</code>释放本地socket。真正的Session还要让重复关闭、读错、写错和主动停止汇合到同一个幂等关闭状态。</p>
+
+  <h2>三次检索练习</h2>
+  <details><summary>1. async_read调用返回时，header一定已经填满了吗？</summary><p>不一定。调用只登记异步操作并立即返回；填满或出错时才调用handler。</p></details>
+  <details><summary>2. 把局部std::string传给async_write后立即离开作用域安全吗？</summary><p>不安全。buffer不拥有字符串内存，字符串必须持续有效到写handler执行。</p></details>
+  <details><summary>3. 两次async_write可以同时操作同一个socket吗？</summary><p>当前设计不可以。用SendQueue保证任一时刻只有一个组合写操作。</p></details>
+
+  <h2>下一次实践的停止线</h2>
+  <p>只做到：监听一个端口，接受连接，按“4字节长度头 + 包体”回显一条消息，并证明半包场景可工作。暂不加入协程、strand、多线程和通用框架。</p>
+  <p>完整参数与返回值见<a href="../reference/boost-asio-tcp-api.html">Boost.Asio TCP API速查</a>。首要原始资料是<a href="https://www.boost.org/doc/libs/1_83_0/doc/html/boost_asio/tutorial.html">Boost.Asio 1.83官方教程</a>。任何一步不清楚，都可以继续问Agent并要求映射到当前Session对象和生命周期。</p>
+</main>
+</body>
+</html>

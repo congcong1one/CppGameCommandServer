@@ -1,4 +1,7 @@
 #include "t1.hpp"
+
+#include <utility>
+#include <vector>
 t1::t1() { pipe = -1; }
 t1::t1(int pipe) { this->pipe = pipe; }
 t1::t1(t1&& other) noexcept {
@@ -39,3 +42,24 @@ t1::~t1() {
     }
 }
 void t1::prt() { std::cout << "hello world" << std::endl; }
+
+void sort(std::vector<int>& nums, int left, int right) {
+    if (left >= right)
+        return;
+    int l = left;
+    int r = right;
+    int privot = nums[l];
+    while (l < r) {
+        while (l < r && nums[r] >= privot) {
+            r--;
+        }
+        while (l < r && nums[l] <= privot) {
+            l++;
+        }
+        std::swap(nums[l], nums[r]);
+    }
+    std::swap(nums[left], nums[l]);
+    sort(nums, left, l - 1);
+    sort(nums, l + 1, right);
+}
+void sort2()
