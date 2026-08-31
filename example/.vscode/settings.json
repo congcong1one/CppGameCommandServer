@@ -1,0 +1,18 @@
+{
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/compile_commands.json",
+  "emeraldwalk.runonsave": {
+    "shell": "/usr/bin/bash",
+    "autoClearConsole": false,
+    "ignoreUnchangedFiles": true,
+    "commands": [
+      {
+        "match": "CMakeLists\\.txt$",
+        "cmd": "bash \"${workspaceFolder}/.vscode/cmake-build.sh\"",
+        "isAsync": false,
+        "autoShowOutputPanel": "error",
+        "message": "Configuring and building after saving ${relativeFile}",
+        "showElapsed": true
+      }
+    ]
+  }
+}

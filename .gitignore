@@ -24,5 +24,15 @@ compile_commands.json
 # Editor-local state
 /.cache/
 .idea/
-.vscode/
+**/.vscode/*
+!/.vscode/cmake-build.sh
+!/.vscode/extensions.json
+!/.vscode/launch.json
+!/.vscode/settings.json
+!/.vscode/tasks.json
+!/example/.vscode/cmake-build.sh
+!/example/.vscode/extensions.json
+!/example/.vscode/launch.json
+!/example/.vscode/settings.json
+!/example/.vscode/tasks.json
 *.swp

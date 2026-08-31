@@ -9,5 +9,5 @@ target_include_directories(CppCommandServer
 	/src/network/network.cpp
 	)
 
-find_package(Boost 1.83 REQUIRED)
-target_link_libraries(CppCommandServer PRIVATE Boost)
+find_package(Boost 1.83 REQUIRED CONFIG)
+target_link_libraries(CppCommandServer PRIVATE Boost::headers)
