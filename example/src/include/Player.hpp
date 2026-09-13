@@ -1,1 +1,16 @@
-class Player {};
+#pragma once
+class Session;
+#include <memory>
+class Player {
+public:
+    Player(int id) : _id(id) {}
+    int getId() const { return _id; }
+
+    inline static int PlayerIdNext = 10000;
+    int getNextPlayerId() { return PlayerIdNext++; }
+    int getSessionId() const;
+
+private:
+    int _id;
+    std::weak_ptr<Session> _session; // Use weak_ptr to avoid circular reference
+};
