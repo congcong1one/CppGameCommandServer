@@ -15,12 +15,11 @@ void network::init(const std::string& address, unsigned short port) {
     _acceptor.bind(boost::asio::ip::tcp::endpoint(
         boost::asio::ip::make_address(address), port));
     _acceptor.listen();
-    
 }
 
-void network::doAccept(){
+void network::doAccept() {
     _acceptor.async_accept([this](boost::system::error_code ec,
-                       boost::asio::ip::tcp::socket socket) {
+                                  boost::asio::ip::tcp::socket socket) {
         if (!ec) {
             // Handle the accepted connection
             int newSessionId = getNextSessionId();
@@ -33,7 +32,3 @@ void network::doAccept(){
         this->doAccept();
     });
 }
-
-
-
-

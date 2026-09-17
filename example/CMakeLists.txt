@@ -6,7 +6,9 @@ add_executable(CppCommandServer src/main.cpp
 target_include_directories(CppCommandServer
 	PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/src/include
-	/src/network/network.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/network
+	${CMAKE_CURRENT_SOURCE_DIR}/src/Session
+	${CMAKE_CURRENT_SOURCE_DIR}/src/player/Player
 	)
 
 find_package(Boost 1.83 REQUIRED CONFIG)
