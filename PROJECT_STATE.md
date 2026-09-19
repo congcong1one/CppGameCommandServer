@@ -3,7 +3,7 @@
 > 本文件是当前进度的唯一权威记录。Agent在新主机或新任务批次开始时先读本文件；批次内有新事实就本地更新，用户明确收尾时统一同步。
 > 用户不需要记住自己进行到哪一步；以本文件为准。
 
-## 当前状态（2026-08-29 更新）
+## 当前状态（2026-09-19 更新）
 
 - **当前模式**：学习
 - **当前交付门**：A（C++准入包）
@@ -14,6 +14,8 @@
 - **最近一次构建/测试命令与结果**：2026-08-22，实验D的缺陷版临时探针输出`SOURCE_INVALID=0 TARGET_OWNS=1 CLOSED_AFTER_SCOPE=1`并在第二次关闭时得到`EBADF`；恢复源对象失效操作后，同一探针输出`SOURCE_INVALID=1 TARGET_OWNS=1 CLOSED_AFTER_SCOPE=1`。全新普通版和ASan/UBSan版构建、运行均退出0；临时综合探针覆盖实验A、B、C、自移动和fd 0边界，全部状态为1并退出0。2026-08-24，延迟迁移首答识别了`duplicate()`的双关闭风险，但误解独立复制契约且只提出日志观察；经Agent提示`fcntl(F_GETFD)`后，用户正确预测原fd在正确实现中有效、错误实现中返回`-1`，该结果只计为提示后修正，不计独立迁移通过
 - **最近环境/文档验证**：2026-08-28，本机Ubuntu已安装Boost 1.83头文件与动态库，CMake能定位`BoostConfig.cmake`；对照Boost.Asio 1.83官方文档整理了Gate B通信架构的限时预习课和TCP API速查，覆盖`io_context`、监听、异步读写、buffer生命周期、错误与关闭语义。该资料只计为预习交付，不计用户能力通过，当前唯一任务不变
 - **最近开发环境验证**：2026-08-29，根工程与`example/`子项目均保留独立VS Code Remote-SSH配置；用户澄清本次目标为`example/`。`example`保存任意`CMakeLists.txt`会运行Debug配置、刷新`example/compile_commands.json`软链接并构建，F5复用同一任务后以GDB调试`example/build/CppCommandServer`。实际补装Boost 1.83开发包并将子项目改为Config模式链接`Boost::headers`后，终端构建/运行、GDB停在`main()`、真实Windows VS Code保存触发和F5均通过，程序退出0。该环境工作不计Gate A能力验收，当前唯一任务不变
+
+- **最近客户端依赖验证**：2026-09-19，用户授权为 `example` 和 `LoginServer` 配置数据库连接与 Protobuf 依赖。复用已运行的 MySQL 8.0.46 和 Redis 7.0.15；安装官方 MySQL Connector/C++ 26.7.0，将连接器、redis++ 1.3.15、hiredis（安装版本 1.4.0）、Protobuf/protoc 3.21.12 的头文件、共享库、许可证和校验值打包到仓库，目标平台为 Ubuntu 24.04/x86_64。两个子工程 Debug 配置、编译、运行成功；依赖 CTest 1/1 通过；本地只读 `SELECT 1` / `PING` 成功；复制到带空格的新路径后 Release 构建、自测和仓库内动态库加载验证通过。两个 VS Code 构建脚本默认单任务。LoginServer 仅补可构建的空入口，既有业务改动保留。这属于环境配置交付，不计独立能力验收，Gate A/卡3、AI-0 和唯一训练任务不变；尚未提交或推送。
 
 ## 下一动作
 
@@ -118,3 +120,5 @@
 | 2026-08-28 | 完成Gate B Boost.Asio通信API限时预习资料；不改变Gate A卡3唯一任务，不计用户能力证据 | 本机Boost 1.83安装与CMake定位已验证；官方1.83文档交叉核对；课程和API速查完成结构、链接与浏览器排版检查 |
 | 2026-08-29 | 新增并实际验证VS Code保存自动构建、编译数据库软链接刷新和F5构建后调试配置；安装远端Run On Save、C++扩展与WSL GDB；不修改核心源码、不改变卡3唯一任务 | 四个JSON与脚本语法通过；根软链接实际重建为`build/compile_commands.json`；真实Remote-SSH窗口保存后出现Run On Save输出，F5识别并执行`cmake: configure and build latest`；两条路径均因既有`src/t1.cpp:65`语法错误停止，未调试旧二进制 |
 | 2026-08-29 | 用户澄清本次VS Code目标为`example/`子项目且要求保留根配置；新增`example/.vscode`独立配置并完成构建、软链接和F5调试闭环 | 实际补装Boost 1.83开发包；修正子项目链接目标为`Boost::headers`；`example` Debug构建与运行退出0，编译数据库软链接正确，GDB在`main()`停住，真实`example [SSH: wsl-ubuntu]`窗口保存触发成功构建且F5启动程序并以代码0退出 |
+
+| 2026-09-19 | 完成 example/LoginServer 的仓库内 MySQL、Redis、Protobuf 客户端依赖接入，携带 Ubuntu 24.04/x86_64 预编译库与 protoc；构建默认单任务，不改变 Gate A/卡3训练状态 | 官方包 SHA-256 校验；两个子工程 Debug 构建/运行；依赖 CTest 1/1；MySQL SELECT 1、Redis PING；带空格的新路径中 Release 构建/自测与 ldd 路径验证全部通过，工作树待用户授权同步 |

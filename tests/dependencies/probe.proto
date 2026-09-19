@@ -1,0 +1,6 @@
+syntax = "proto3";
+package dependency_test;
+message Probe {
+  string text = 1;
+  uint64 sequence = 2;
+}

@@ -1,9 +1,9 @@
 #include "Session.hpp"
 
-#include "Player.hpp"
-static std::unordered_map<int, std::shared_ptr<Player>> onlinePlayers;
-static std::unordered_map<int, std::shared_ptr<Player>> cachePlayers;
+#include <iterator>
 
+#include "Player.hpp"
+#include "Tool.hpp"
 Session::Session(boost::asio::ip::tcp::socket socket, int sessionId,
                  PlayerManager& playerManager)
     : _socket(std::move(socket)), id(sessionId), _playerManager(playerManager) {
@@ -11,13 +11,17 @@ Session::Session(boost::asio::ip::tcp::socket socket, int sessionId,
     _saveBuffer.head = 0;
     _saveBuffer.size = 0;
 }
-
+const uint16_t _magic =
+    0xFCCD;  // Example magic number, replace with your actual value
 bool Session::BindPlayer(int PlayerId) {
-    if (onlinePlayers.find(PlayerId) != onlinePlayers.end()) {
-        _player = onlinePlayers[PlayerId];
+    if (PlayerId <= 0) {
+        return false;  // Invalid PlayerId
+    }
+    if (_playerManager.getOnlinePlayer(PlayerId)) {
+        _player = _playerManager.getOnlinePlayer(PlayerId);
     } else {
         auto player = std::make_shared<Player>(PlayerId);
-        onlinePlayers[PlayerId] = player;
+        _playerManager.addOnlinePlayer(PlayerId, player);
         _player = player;
     }
 
@@ -86,5 +90,25 @@ void Session::doRead() {
 
 void Session::resumeBuffer() {
     while (true) {
+        if (_saveBuffer.size < sizeof(uint16_t) + sizeof(uint32_t) +
+                                   sizeof(uint32_t) + sizeof(uint32_t) +
+                                   sizeof(uint32_t)) {
+            return;  // Not enough data to process a message
+        }
+        PacketHeader header;
+        header.magic = Tool::readRingBufferUint16(_saveBuffer);
+        if (header.magic != _magic) {
+            closeSession();
+            return;  // Invalid magic number, close the session
+        }
+        header.length = Tool::readRingBufferUint32(_saveBuffer);
+        if (header.length > MAX_MESSAGE_REMAINING_SIZE) {
+            closeSession();
+            return;  // Invalid length, close the session
+        }
+        header.msgId = Tool::readRingBufferUint32(_saveBuffer);
+        header.seq = Tool::readRingBufferUint32(_saveBuffer);
+        header.playerId = Tool::readRingBufferUint32(_saveBuffer);
+        header.body = Tool::readRingBuffer(_saveBuffer, header.length);
     }
 }

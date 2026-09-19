@@ -27,3 +27,8 @@ void PlayerManager::checkPlayerTimeouts(int timeoutSeconds) {
         }
     }
 }
+
+void PlayerManager::addOnlinePlayer(int playerId,
+                                    std::shared_ptr<Player> player) {
+    onlinePlayers[playerId] = player;
+}

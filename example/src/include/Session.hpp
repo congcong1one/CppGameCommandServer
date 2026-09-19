@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <boost/asio.hpp>
 #include <iostream>
+#include <vector>
 
 #include "PlayerManager.hpp"
 class Player;
@@ -11,10 +12,18 @@ struct Buffer {
     int head;
     int size;
 };
+struct PacketHeader {
+    uint16_t magic;
+    uint32_t length;
+    uint32_t msgId;
+    uint32_t seq;
+    uint32_t playerId;
+    std::vector<char> body;
+};
 constexpr int MAX_BUFFER_SIZE = 1024 * 8;  // 8KB buffer size
 constexpr int MAX_SAVE_BUFFER_SIZE =
     MAX_BUFFER_SIZE * 4;  // 16KB save buffer size
-constexpr int MIN_MESSAGE_REMAINING_SIZE = MAX_BUFFER_SIZE * 2;
+constexpr int MAX_MESSAGE_REMAINING_SIZE = MAX_BUFFER_SIZE * 2;
 class Session : public std::enable_shared_from_this<Session> {
     Session() = default;
 

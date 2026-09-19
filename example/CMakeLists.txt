@@ -13,3 +13,6 @@ target_include_directories(CppCommandServer
 
 find_package(Boost 1.83 REQUIRED CONFIG)
 target_link_libraries(CppCommandServer PRIVATE Boost::headers)
+
+include(${CMAKE_CURRENT_LIST_DIR}/../cmake/GameDependencies.cmake)
+target_link_libraries(CppCommandServer PRIVATE GameServer::Dependencies)

@@ -10,10 +10,10 @@ class PlayerManager {
 public:
     std::shared_ptr<Player> getOnlinePlayer(int playerId);
     std::shared_ptr<Player> getCachePlayer(int playerId);
-    void addOnlinePlayer(std::shared_ptr<Player> player);
+    void addOnlinePlayer(int playerId, std::shared_ptr<Player> player);
     void removeOnlinePlayer(int playerId);
 
-    void addCachePlayer(std::shared_ptr<Player> player);
+    void addCachePlayer(int playerId, std::shared_ptr<Player> player);
     void removeCachePlayer(int playerId);
 
     void playerOffline(int playerId);

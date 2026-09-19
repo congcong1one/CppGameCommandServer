@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.28)
+project(DependencySmoke LANGUAGES CXX)
+
+include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/GameDependencies.cmake)
+enable_testing()
+add_executable(dependency_smoke main.cpp probe.proto)
+target_link_libraries(dependency_smoke PRIVATE GameServer::Dependencies)
+target_include_directories(dependency_smoke PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+protobuf_generate(TARGET dependency_smoke APPEND_PATH)
+add_test(NAME dependencies COMMAND dependency_smoke)
+set_tests_properties(dependencies PROPERTIES TIMEOUT 10)

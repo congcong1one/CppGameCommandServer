@@ -36,3 +36,6 @@ compile_commands.json
 !/example/.vscode/settings.json
 !/example/.vscode/tasks.json
 *.swp
+
+# Versioned Ubuntu client dependency bundle (intentional shared libraries).
+!/third_party/ubuntu24.04-x86_64/lib/*.so

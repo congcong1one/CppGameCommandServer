@@ -34,4 +34,4 @@ elif [[ -e "${compile_commands_link}" ]]; then
 fi
 
 ln -s "build/compile_commands.json" "${compile_commands_link}"
-cmake --build "${build_dir}" --parallel
+cmake --build "${build_dir}" --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-1}"
