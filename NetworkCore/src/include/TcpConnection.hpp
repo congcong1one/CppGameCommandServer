@@ -4,33 +4,21 @@
 #include <iostream>
 #include <vector>
 
-#include "PlayerManager.hpp"
+#include "entity/Buffer.hpp"
+#include "entity/PacketHeader.hpp"
+// #include "PlayerManager.hpp"
 class Player;
 
-struct Buffer {
-    std::vector<char> data;
-    int head;
-    int size;
-};
-struct PacketHeader {
-    uint16_t magic;
-    uint32_t length;
-    uint32_t msgId;
-    uint32_t seq;
-    uint32_t playerId;
-    std::vector<char> body;
-};
 constexpr int MAX_BUFFER_SIZE = 1024 * 8;  // 8KB buffer size
 constexpr int MAX_SAVE_BUFFER_SIZE =
     MAX_BUFFER_SIZE * 4;  // 16KB save buffer size
 constexpr int MAX_MESSAGE_REMAINING_SIZE = MAX_BUFFER_SIZE * 2;
-class Session : public std::enable_shared_from_this<Session> {
-    Session() = default;
+class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
+    TcpConnection() = default;
 
 public:
-    Session(boost::asio::ip::tcp::socket socket, int sessionId,
-            PlayerManager& playerManager);
-    bool BindPlayer(int PlayerId);
+    TcpConnection(boost::asio::ip::tcp::socket socket, int connectionId);
+    // bool BindPlayer(int PlayerId);
     int getId() const { return id; }
 
 private:
@@ -38,10 +26,9 @@ private:
     bool saveBuffer(std::array<char, MAX_BUFFER_SIZE>& buffer, size_t length,
                     Buffer& saveBuffer);
     void resumeBuffer();
-    void closeSession();
+    void closeConnection();
     boost::asio::ip::tcp::socket _socket;
     std::shared_ptr<Player> _player;
-    PlayerManager& _playerManager;
     int id;
     Buffer _saveBuffer;
     std::array<char, MAX_BUFFER_SIZE> _buffer;

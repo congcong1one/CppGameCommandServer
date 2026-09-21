@@ -30,11 +30,11 @@ compile_commands.json
 !/.vscode/launch.json
 !/.vscode/settings.json
 !/.vscode/tasks.json
-!/example/.vscode/cmake-build.sh
-!/example/.vscode/extensions.json
-!/example/.vscode/launch.json
-!/example/.vscode/settings.json
-!/example/.vscode/tasks.json
+!/NetworkCore/.vscode/cmake-build.sh
+!/NetworkCore/.vscode/extensions.json
+!/NetworkCore/.vscode/launch.json
+!/NetworkCore/.vscode/settings.json
+!/NetworkCore/.vscode/tasks.json
 *.swp
 
 # Versioned Ubuntu client dependency bundle (intentional shared libraries).

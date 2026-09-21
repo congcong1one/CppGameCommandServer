@@ -47,6 +47,8 @@ AI Coding 与 C++ 同期训练，但按证据逐级放权：Gate A 以 AI-0（�
 
 ## 构建状态
 
+网络原型现位于 [NetworkCore](NetworkCore/README.md)（原 `example`），连接类型为 `TcpConnection`，演示目标为 `NetworkCoreDemo`。该子工程尚未形成公共网络库；具体边界、构建命令及已确认问题见其 README。
+
 当前已形成最小多文件 CMake 工程。经过验证的命令为：
 
 ```bash

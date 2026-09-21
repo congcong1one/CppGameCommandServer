@@ -3,12 +3,9 @@
 #include <atomic>
 #include <memory>
 
-#include "Session.hpp"
+#include "TcpConnectionManager.hpp"
 
-static std::unordered_map<int, std::shared_ptr<Session>> sessions;
-
-static int sessionIdNext = 10000;
-int getNextSessionId() { return sessionIdNext++; }
+static std::unordered_map<int, std::shared_ptr<TcpConnection>> connections;
 
 void network::init(const std::string& address, unsigned short port) {
     _acceptor.open(boost::asio::ip::tcp::v4());
@@ -22,11 +19,11 @@ void network::doAccept() {
                                   boost::asio::ip::tcp::socket socket) {
         if (!ec) {
             // Handle the accepted connection
-            int newSessionId = getNextSessionId();
-            auto session = std::make_shared<Session>(
+            int newConnectionId = _connectionManager.getNextConnectionId();
+            auto connection = std::make_unique<TcpConnection>(
                 std::move(socket),
-                newSessionId);  // Assuming playerId is 1 for this example
-            sessions[newSessionId] = session;
+                newConnectionId);  // Assuming playerId is 1 for this example
+            _connectionManager.addConnection(std::move(connection));
         }
         // Continue accepting new connections
         this->doAccept();

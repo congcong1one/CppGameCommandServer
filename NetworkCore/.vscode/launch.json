@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug latest CppCommandServer",
+      "name": "Debug latest NetworkCoreDemo",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/CppCommandServer",
+      "program": "${workspaceFolder}/build/NetworkCoreDemo",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

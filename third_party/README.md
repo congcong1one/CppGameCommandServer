@@ -1,6 +1,6 @@
 # 仓库内客户端依赖
 
-适用环境：**Ubuntu 24.04 / x86_64**，包括 WSL2。`example` 和 `LoginServer` 通过 `cmake/GameDependencies.cmake` 使用这套文件。头文件、共享库、相对符号链接、`protoc`、许可证和校验值都应一起进入 Git；不是 Git LFS 指针，也不要求再次编译这些库。
+适用环境：**Ubuntu 24.04 / x86_64**，包括 WSL2。`NetworkCore` 和 `LoginServer` 通过 `cmake/GameDependencies.cmake` 使用这套文件。头文件、共享库、相对符号链接、`protoc`、许可证和校验值都应一起进入 Git；不是 Git LFS 指针，也不要求再次编译这些库。
 
 | 依赖 | 版本 | 接入目标 / 头文件 |
 |---|---|---|
@@ -25,13 +25,13 @@ sudo apt-get install -y build-essential cmake libboost1.83-dev libssl3t64 zlib1g
 在仓库根目录执行：
 
 ```sh
-cmake -S example -B example/build -DCMAKE_BUILD_TYPE=Debug
-cmake --build example/build --parallel 1
+cmake -S NetworkCore -B NetworkCore/build -DCMAKE_BUILD_TYPE=Debug
+cmake --build NetworkCore/build --parallel 1
 cmake -S LoginServer -B LoginServer/build -DCMAKE_BUILD_TYPE=Debug
 cmake --build LoginServer/build --parallel 1
 ```
 
-两个工程沿用现有 VS Code 调试配置的可执行文件名 `CppCommandServer`。`LoginServer/src/main.cpp` 目前仅为可构建的空入口，不包含登录业务实现。两个保存触发的构建脚本默认单任务，可用 `CMAKE_BUILD_PARALLEL_LEVEL` 明确调整。
+`NetworkCore` 的演示可执行文件名为 `NetworkCoreDemo`；`LoginServer` 沿用可执行文件名 `CppCommandServer`。`LoginServer/src/main.cpp` 目前仅为可构建的空入口，不包含登录业务实现。两个保存触发的构建脚本默认单任务，可用 `CMAKE_BUILD_PARALLEL_LEVEL` 明确调整。
 
 在新目录重新运行 CMake；不要复制旧的 `build/`、CMake 缓存或 `compile_commands.json`。此方案不承诺旧构建目录或独立拷走的可执行文件可以直接运行。
 
