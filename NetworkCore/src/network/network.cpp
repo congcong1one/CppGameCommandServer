@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <utility>
 
 #include "TcpConnectionManager.hpp"
 
@@ -19,13 +20,11 @@ void network::doAccept() {
                                   boost::asio::ip::tcp::socket socket) {
         if (!ec) {
             // Handle the accepted connection
-            int newConnectionId = _connectionManager.getNextConnectionId();
-            auto connection = std::make_unique<TcpConnection>(
-                std::move(socket),
-                newConnectionId);  // Assuming playerId is 1 for this example
-            _connectionManager.addConnection(std::move(connection));
+            auto connection =
+                _connectionManager.createAndAddConnection(std::move(socket));
+            connection->doRead();  // Start reading from the socket
+            // Continue accepting new connections
         }
-        // Continue accepting new connections
         this->doAccept();
     });
 }

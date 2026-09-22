@@ -1,8 +1,8 @@
 #include <boost/asio.hpp>
 
-#include "TcpConnection.hpp"
 #include "TcpConnectionManager.hpp"
 class network {
+public:
     network(boost::asio::io_context& io) : _acceptor(io) {}
 
     void init(const std::string& address, unsigned short port);

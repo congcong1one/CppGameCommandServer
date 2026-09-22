@@ -3,13 +3,16 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
-class TcpConnection;
+
+#include "TcpConnection.hpp"
 class TcpConnectionManager {
 public:
     TcpConnectionManager(int initialConnectionId = 10000, int bucketCount = 4);
     ~TcpConnectionManager();
 
-    void addConnection(std::unique_ptr<TcpConnection> connection);
+    void addConnection(std::shared_ptr<TcpConnection> connection);
+    std::shared_ptr<TcpConnection> createAndAddConnection(
+        boost::asio::ip::tcp::socket _socket);
     void removeConnection(int connectionId);
     void handleMessages();
     int getNextConnectionId();
@@ -19,6 +22,6 @@ private:
     std::mutex _connectionsMutex;
     int connectionIdNext;
     int bucketCount;
-    std::vector<std::unordered_map<int, std::unique_ptr<TcpConnection>>>
+    std::vector<std::unordered_map<int, std::shared_ptr<TcpConnection>>>
         _connectionBuckets;
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <vector>
 
 struct PacketHeader {
     uint16_t magic;

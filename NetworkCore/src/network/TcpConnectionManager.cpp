@@ -17,12 +17,24 @@ TcpConnectionManager::TcpConnectionManager(int initialConnectionId,
       _connectionBuckets(bucketCount) {}
 
 void TcpConnectionManager::addConnection(
-    std::unique_ptr<TcpConnection> connection) {
-    int bucketIndex = getNextConnectionId() % bucketCount;
-    _connectionBuckets[bucketIndex][getNextConnectionId()] =
-        std::move(connection);
+    std::shared_ptr<TcpConnection> connection) {
+    int id = getNextConnectionId();
+    int bucketIndex = id % bucketCount;
+    _connectionBuckets[bucketIndex][id] = std::move(connection);
+}
+std::shared_ptr<TcpConnection> TcpConnectionManager::createAndAddConnection(
+    boost::asio::ip::tcp::socket _socket) {
+    int id = getNextConnectionId();
+    auto connection = std::make_shared<TcpConnection>(
+        std::move(_socket),
+        id);  // Assuming playerId is 1 for this example
+    int bucketIndex = id % bucketCount;
+    _connectionBuckets[bucketIndex][id] = connection;
+    return connection;
 }
 void TcpConnectionManager::removeConnection(int connectionId) {
     int bucketIndex = connectionId % bucketCount;
     _connectionBuckets[bucketIndex].erase(connectionId);
 }
+
+TcpConnectionManager::~TcpConnectionManager() {}

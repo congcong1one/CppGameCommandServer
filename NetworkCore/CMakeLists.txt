@@ -3,7 +3,11 @@ project(NetworkCore LANGUAGES CXX)
 
 # The existing demo entry point remains the only compiled source.
 # Networking sources still need the fixes listed in README.md before library extraction.
-add_executable(NetworkCoreDemo src/main.cpp)
+add_executable(NetworkCoreDemo src/main.cpp
+                src/network/TcpConnection.cpp
+                src/network/network.cpp
+                src/network/TcpConnectionManager.cpp
+)
 target_include_directories(NetworkCoreDemo PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
 

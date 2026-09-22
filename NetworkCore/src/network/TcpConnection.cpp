@@ -1,21 +1,24 @@
 #include "TcpConnection.hpp"
 
-#include <iterator>
+#include <algorithm>
+#include <iostream>
 
-#include "Player.hpp"
 #include "Tool.hpp"
+#include "entity/PacketHeader.hpp"
 const size_t PACKET_HEADER_SIZE = sizeof(uint16_t) + sizeof(uint32_t) +
                                   sizeof(uint32_t) + sizeof(uint32_t) +
                                   sizeof(uint32_t);
 TcpConnection::TcpConnection(boost::asio::ip::tcp::socket socket,
                              int connectionId)
     : _socket(std::move(socket)), id(connectionId) {
-    _saveBuffer.data = std::vector<char>(MAX_BUFFER_SIZE);
-    _saveBuffer.head = 0;
-    _saveBuffer.size = 0;
+    _recvBuffer.data = std::vector<char>(MAX_SAVE_BUFFER_SIZE);
+    _recvBuffer.head = 0;
+    _recvBuffer.size = 0;
+    // doRead();  // Start reading from the socket
 }
 const uint16_t _magic =
     0xFCCD;  // Example magic number, replace with your actual value
+
 // bool TcpConnection::BindPlayer(int PlayerId) {
 //     if (PlayerId <= 0) {
 //         return false;  // Invalid PlayerId
@@ -36,7 +39,7 @@ void TcpConnection::closeConnection() {
         return;  // TcpConnection is already closed
     }
     boost::system::error_code ec;
-    _socket.close(ec);
+    getSocket().close(ec);
     if (ec) {
         std::cerr << "Error closing socket: " << ec.message() << std::endl;
     }
@@ -67,6 +70,9 @@ bool TcpConnection::saveBuffer(std::array<char, MAX_BUFFER_SIZE>& buffer,
                   _saveBuffer.data.begin() + endIndex);
     }
     _saveBuffer.size += length;
+    if (_saveBuffer.data.size() < MAX_MESSAGE_REMAINING_SIZE) {
+        return false;
+    }
     return true;
 }
 
@@ -80,7 +86,7 @@ void TcpConnection::doRead() {
                                     size_t length) {
             if (!ec) {
                 if (!self->saveBuffer(self->_buffer, length,
-                                      self->_saveBuffer)) {
+                                      self->_recvBuffer)) {
                     return;  // Buffer overflow, stop reading
                 }
                 self->doRead();  // Continue reading
@@ -88,31 +94,52 @@ void TcpConnection::doRead() {
         });
 }
 
+void TcpConnection::doWrite() {
+    if (_bClosed) {
+        return;  // TcpConnection is closed, stop writing
+    }
+    boost::asio::async_write(
+        _socket, boost::asio::buffer(_sendBuffer.front()),
+        [self = shared_from_this()](boost::system::error_code ec,
+                                    size_t /*length*/) {
+            if (ec) {
+                self->closeConnection();  // Error occurred, close the
+                return;
+            }
+            self->_sendBuffer.pop_front();
+            if (!self->_sendBuffer.empty()) {
+                self->doWrite();  // Continue writing
+            }
+        });
+}
+
 void TcpConnection::resumeBuffer() {
     while (true) {
-        if (_saveBuffer.size < PACKET_HEADER_SIZE) {
+        if (_recvBuffer.size < PACKET_HEADER_SIZE) {
             return;  // Not enough data to process a message
         }
         PacketHeader header;
-        header.magic = Tool::readRingBufferUint16(_saveBuffer);
+        header.magic = Tool::readRingBufferUint16(_recvBuffer);
         if (header.magic != _magic) {
             closeConnection();
             return;  // Invalid magic number, close the connection
         }
-        header.length = Tool::readRingBufferUint32(_saveBuffer);
+        header.length = Tool::readRingBufferUint32(_recvBuffer);
         if (header.length > MAX_MESSAGE_REMAINING_SIZE) {
             closeConnection();
             return;  // Invalid length, close the connection
         }
-        if (_saveBuffer.size < PACKET_HEADER_SIZE + header.length) {
+        if (_recvBuffer.size < PACKET_HEADER_SIZE + header.length) {
             return;  // Not enough data to process the complete message
         }
-        header.msgId = Tool::readRingBufferUint32(_saveBuffer);
-        header.seq = Tool::readRingBufferUint32(_saveBuffer);
-        header.playerId = Tool::readRingBufferUint32(_saveBuffer);
+        header.msgId = Tool::readRingBufferUint32(_recvBuffer);
+        header.seq = Tool::readRingBufferUint32(_recvBuffer);
+        header.playerId = Tool::readRingBufferUint32(_recvBuffer);
 
         // header.body = Tool::readRingBuffer(_saveBuffer, header.length);
 
         // 投递消息入口，与消息层的交互处
     }
 }
+
+boost::asio::ip::tcp::socket& TcpConnection::getSocket() { return _socket; }
